@@ -1,0 +1,272 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── User ────────────────────────────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  avatarUrl String?
+  credits   Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  creditLogs        Credit[]
+  payments          Payment[]
+  couponRedemptions CouponRedemption[]
+  apiKeys           ApiKey[]
+  chats             Chat[]
+  reports           Report[]
+  usageLogs         UsageLog[]
+  settings          Settings?
+
+  @@index([email])
+}
+
+// ─── Credits ─────────────────────────────────────────────────────────────────
+
+enum CreditType {
+  PURCHASE
+  COUPON
+  USAGE
+  REFUND
+}
+
+model Credit {
+  id          String     @id @default(uuid())
+  userId      String
+  amount      Float
+  type        CreditType
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+}
+
+// ─── Payments ────────────────────────────────────────────────────────────────
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+model Payment {
+  id                    String        @id @default(uuid())
+  userId                String
+  stripePaymentIntentId String?       @unique
+  stripeSessionId       String?       @unique
+  amount                Float
+  currency              String        @default("usd")
+  status                PaymentStatus @default(PENDING)
+  creditsAdded          Float         @default(0)
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}
+
+// ─── Coupon Redemption ───────────────────────────────────────────────────────
+
+model CouponRedemption {
+  id           String   @id @default(uuid())
+  userId       String
+  couponCode   String
+  creditsAdded Float
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, couponCode])
+  @@index([userId])
+  @@index([couponCode])
+}
+
+// ─── API Keys ────────────────────────────────────────────────────────────────
+
+enum AIProvider {
+  OPENAI
+  ANTHROPIC
+  KIMI
+  CUSTOM
+}
+
+model ApiKey {
+  id           String     @id @default(uuid())
+  userId       String
+  provider     AIProvider
+  encryptedKey String
+  label        String?
+  endpoint     String?
+  model        String?
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([provider])
+}
+
+// ─── Chats ───────────────────────────────────────────────────────────────────
+
+model Chat {
+  id          String   @id @default(uuid())
+  userId      String
+  title       String   @default("New Chat")
+  model       String?
+  provider    String?
+  totalTokens Int      @default(0)
+  totalCost   Float    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages Message[]
+  reports  Report[]
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// ─── Messages ────────────────────────────────────────────────────────────────
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+  TOOL
+}
+
+model Message {
+  id               String      @id @default(uuid())
+  chatId           String
+  role             MessageRole
+  content          String
+  toolName         String?
+  toolResult       Json?
+  thinkingSteps    Json?
+  citations        Json?
+  promptTokens     Int         @default(0)
+  completionTokens Int         @default(0)
+  cachedTokens     Int         @default(0)
+  cost             Float       @default(0)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@index([chatId])
+  @@index([role])
+}
+
+// ─── Reports ─────────────────────────────────────────────────────────────────
+
+model Report {
+  id        String   @id @default(uuid())
+  userId    String
+  chatId    String?
+  title     String
+  content   String
+  pdfData   Bytes?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chat Chat? @relation(fields: [chatId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([chatId])
+}
+
+// ─── Usage Logs ──────────────────────────────────────────────────────────────
+
+model UsageLog {
+  id               String   @id @default(uuid())
+  userId           String
+  chatId           String?
+  model            String
+  provider         String
+  promptTokens     Int      @default(0)
+  completionTokens Int      @default(0)
+  cachedTokens     Int      @default(0)
+  cost             Float    @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([model])
+  @@index([createdAt])
+}
+
+// ─── Cache Entries ───────────────────────────────────────────────────────────
+
+model CacheEntry {
+  id           String   @id @default(uuid())
+  promptHash   String   @unique
+  model        String
+  response     String
+  inputTokens  Int      @default(0)
+  outputTokens Int      @default(0)
+  cacheTokens  Int      @default(0)
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([promptHash])
+  @@index([model])
+  @@index([expiresAt])
+}
+
+// ─── Model Pricing ───────────────────────────────────────────────────────────
+
+model ModelPricing {
+  id                  String   @id @default(uuid())
+  provider            String
+  model               String
+  displayName         String
+  inputPricePerToken  Float
+  outputPricePerToken Float
+  cachePricePerToken  Float    @default(0)
+  isActive            Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@unique([provider, model])
+  @@index([provider])
+  @@index([isActive])
+}
+
+// ─── Settings ────────────────────────────────────────────────────────────────
+
+model Settings {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  theme           String   @default("dark")
+  defaultModel    String?
+  defaultProvider String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
