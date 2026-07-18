@@ -71,7 +71,7 @@ const testimonials = [
 
 function TestimonialCard({ img, name, username, body, country }: (typeof testimonials)[number]) {
   return (
-    <Card className="w-[300px] shrink-0 border-border/50 bg-card/40 backdrop-blur-md">
+    <Card className="w-[300px] shrink-0 border-border/50 bg-card shadow-sm">
       <CardContent className="p-4">
         <div className="flex items-center gap-2.5">
           <Avatar className="size-9">

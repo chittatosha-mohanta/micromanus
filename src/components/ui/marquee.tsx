@@ -91,6 +91,7 @@ export function Marquee({
                   'flex shrink-0 justify-around',
                   !vertical && 'animate-marquee flex-row',
                   vertical && 'animate-marquee-vertical flex-col',
+                  'will-change-transform',
                   pauseOnHover && 'group-hover:[animation-play-state:paused]',
                   reverse && '[animation-direction:reverse]',
                 )}
