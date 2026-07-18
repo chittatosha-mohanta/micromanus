@@ -95,9 +95,9 @@ export function TestimonialsSection() {
   return (
     <section className="py-24 px-6 relative overflow-hidden bg-background border-y border-border/50">
       <div className="max-w-6xl mx-auto text-center mb-12 relative z-10">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">Trusted by developers worldwide</h2>
+        <h2 className="text-3xl md:text-4xl font-bold mb-4">Trusted By Researchers Worldwide</h2>
         <p className="text-muted-foreground text-lg">
-          Join thousands of developers who are already building the future with our AI platform
+          Join thousands of researchers who are already building the future with Micromanage
         </p>
       </div>
 
@@ -140,7 +140,7 @@ export function TestimonialsSection() {
             ))}
           </Marquee>
         </div>
-        
+
         {/* Gradient overlays for vertical marquee */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-[30%] bg-gradient-to-b from-background"></div>
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-background"></div>

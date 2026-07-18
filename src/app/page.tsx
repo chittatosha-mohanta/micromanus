@@ -208,28 +208,45 @@ export default function LandingPage() {
           </motion.div>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 md:grid-cols-3 auto-rows-[250px] gap-4 md:gap-6"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={stagger}
           >
-            {features.map((feature) => (
-              <motion.div
-                key={feature.title}
-                className="group p-6 rounded-2xl border border-border/50 bg-card/30 hover:bg-card/60 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5"
-                variants={fadeInUp}
-                transition={{ duration: 0.5 }}
-              >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                  <feature.icon className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {feature.description}
-                </p>
-              </motion.div>
-            ))}
+            {features.map((feature, i) => {
+              // Create the Bento Grid layout shapes
+              let bentoClass = "md:col-span-1 md:row-span-1";
+              if (i === 0) bentoClass = "md:col-span-2 md:row-span-2 bg-gradient-to-br from-primary/10 to-transparent"; // Large hero feature
+              if (i === 4) bentoClass = "md:col-span-2 md:row-span-1"; // Wide feature
+              if (i === 5) bentoClass = "md:col-span-3 md:row-span-1"; // Full width footer feature
+
+              return (
+                <motion.div
+                  key={feature.title}
+                  className={`group relative p-8 rounded-3xl border-t border-l border-t-primary/30 border-l-primary/30 border-b border-r border-b-border/20 border-r-border/20 bg-card/50 hover:bg-card/70 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 overflow-hidden flex flex-col justify-end ${bentoClass}`}
+                  variants={fadeInUp}
+                  transition={{ duration: 0.5 }}
+                >
+                  {/* Subtle background glow on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-transparent transition-all duration-500 pointer-events-none" />
+                  
+                  <div className="relative z-10 flex flex-col h-full">
+                    <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-auto group-hover:bg-primary/20 transition-colors group-hover:scale-110 duration-500">
+                      <feature.icon className="w-6 h-6 text-primary" />
+                    </div>
+                    <div className="mt-8">
+                      <h3 className={`font-bold mb-2 ${i === 0 ? 'text-3xl' : 'text-xl'}`}>
+                        {feature.title}
+                      </h3>
+                      <p className={`text-muted-foreground leading-relaxed ${i === 0 ? 'text-lg max-w-md' : 'text-sm'}`}>
+                        {feature.description}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
           </motion.div>
         </div>
       </section>

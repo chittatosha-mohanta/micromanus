@@ -120,7 +120,7 @@ export function Pricing({
               opacity: { duration: 0.5 },
             }}
             className={cn(
-              `rounded-2xl border-[1px] p-6 bg-background text-center lg:flex lg:flex-col lg:justify-center relative`,
+              `group rounded-2xl border-[1px] p-6 bg-background text-center lg:flex lg:flex-col lg:justify-center relative`,
               plan.isPopular ? "border-primary border-2" : "border-border",
               "flex flex-col",
               !plan.isPopular && "mt-5",
@@ -131,6 +131,11 @@ export function Pricing({
               index === 2 && "origin-left"
             )}
           >
+            {/* Glowing Blinking Border on Hover */}
+            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20">
+              <div className="absolute inset-[-1px] rounded-2xl border-2 border-primary shadow-[0_0_20px_hsl(var(--primary)/0.5)] animate-pulse" />
+            </div>
+
             {plan.isPopular && (
               <div className="absolute top-0 right-0 bg-primary py-0.5 px-2 rounded-bl-xl rounded-tr-xl flex items-center">
                 <Star className="text-primary-foreground h-4 w-4 fill-current" />
