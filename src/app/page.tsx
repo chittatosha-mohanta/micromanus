@@ -7,7 +7,7 @@ import {
   ArrowRight, Sparkles, Globe, ChevronRight
 } from 'lucide-react';
 import { Pricing, PricingPlan } from '@/components/pricing';
-import { Marquee } from '@/components/ui/marquee';
+import { TestimonialsSection } from '@/components/testimonials';
 
 const features = [
   {
@@ -235,25 +235,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Trusted By ──────────────────────────────────────────────────────── */}
-      <section className="py-16 px-6 border-y border-border/50 bg-secondary/20 overflow-hidden">
-        <div className="max-w-6xl mx-auto text-center mb-8">
-          <h2 className="text-2xl font-bold mb-3">Trusted by developers worldwide</h2>
-          <p className="text-muted-foreground">
-            Join thousands of developers who are already building the future with our AI platform
-          </p>
-        </div>
-        <div className="max-w-full mx-auto relative">
-          <div className="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-          <div className="absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
-          <Marquee pauseOnHover className="[--duration:20s]">
-            {["Google", "Microsoft", "Amazon", "Meta", "Netflix", "Spotify", "Stripe", "Vercel", "Supabase", "OpenAI"].map((company) => (
-              <div key={company} className="px-8 py-3 rounded-xl bg-card/50 border border-border/50 font-semibold text-lg text-muted-foreground shadow-sm flex items-center justify-center min-w-[150px]">
-                {company}
-              </div>
-            ))}
-          </Marquee>
-        </div>
-      </section>
+      <TestimonialsSection />
 
       {/* ── Pricing ───────────────────────────────────────────────────────── */}
       <section className="py-24 relative overflow-hidden">
